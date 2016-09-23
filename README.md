@@ -1,5 +1,5 @@
 # Neural Network Playground
 
-* Mini NN library based on numpy. 
-* fully connected MNIST example
-* gradient checking
+* Mini NN library based on Numpy. 
+* Fully connected MNIST example
+* Numerical Gradient checking
