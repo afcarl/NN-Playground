@@ -9,13 +9,17 @@ class DenseCell(GraphOperation):
   Fully connected layer without activation.
   """
 
-  def __init__(self, size_in, size_out, stddev=0.01):
+  def __init__(self, size_in, size_out, stddev=0.01, name="empty-name"):
     self.W = np.random.normal(scale=stddev, size=size_in*size_out).reshape((size_in, size_out))
     self.z = np.zeros(size_out)
+    self.name = name
     self.delta = np.zeros(size_out)
 
   def __call__(self, z):
     return self.forward(z)
+
+  def get_name(self):
+    return self.name
 
   def forward(self, x):
     """
@@ -25,9 +29,8 @@ class DenseCell(GraphOperation):
     """
     assert type(x) == np.ndarray, "x is not a np.ndarray"
     assert x.shape[1] == self.W.shape[0], "x "+x.shape+" doesn't match W " + self.W.shape
-
-    self.z = np.dot(x, self.W)
-    return self.z
+    self.z = x
+    return np.dot(x, self.W)
  
   def backward(self, delta):
     """
@@ -43,7 +46,17 @@ class DenseCell(GraphOperation):
     Compute the gradient based on the prior forward and backward pass.
     :return: returns the gradient of the
     """
-    return np.outer(self.z, self.delta)
+    output = []
+    for i in range(self.z.shape[0]):
+      output.append(np.outer(self.z[i], self.delta[i]))
+    return output
+
+  def get_weights(self):
+    """
+    Getter method for the weights of this cell.
+    :return: weight matrix
+    """
+    return self.W
 
   def update_weights(self, delta_update):
     """
