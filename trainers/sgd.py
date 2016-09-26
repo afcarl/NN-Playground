@@ -23,28 +23,28 @@ class SGD:
       cell.update_weights(dW_step)
 
 
-  def train(self, X, Y, epochs, batch_size, learning_rate, network):
-    assert batch_size <= X.shape[0], "batch size cannot be larger than the number of samples"
+  def train(self, X, Y, epochs, train_batch_size, eval_batch_size, learning_rate, network):
+    assert train_batch_size <= X.shape[0], "batch size cannot be larger than the number of samples"
 
     print("pre evaluation:")
-    self.evaluate(X, Y, batch_size=2000, network=network)
+    self.evaluate(X, Y, batch_size=eval_batch_size, network=network)
 
-    batches_per_epoch = math.ceil(X.shape[0] / batch_size)
+    batches_per_epoch = math.ceil(X.shape[0] / train_batch_size)
     print("batches per epoch: ", batches_per_epoch)
     for i in range(epochs):
       print("Epoch {}:".format(i))
 
       for j in range(batches_per_epoch):
 
-        start_idx = j * batch_size
-        end_idx = start_idx + batch_size
+        start_idx = j * train_batch_size
+        end_idx = start_idx + train_batch_size
 
         batch = X[start_idx:end_idx]
         targets = Y[start_idx:end_idx]
         print("epoch {:0.3f}".format(i + j/batches_per_epoch), end="")
         self.__gradient_descent_batch(batch, targets, learning_rate, network)
 
-      self.evaluate(X, Y, batch_size=2000, network=network)
+      self.evaluate(X, Y, batch_size=eval_batch_size, network=network)
 
   def evaluate(self, X, Y, batch_size, network):
     assert batch_size <= X.shape[0], "batch size cannot be larger the the number of samples"

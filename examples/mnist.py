@@ -27,6 +27,6 @@ misc.utils.shuffle_in_unison(X, Y)
 net = FullyConnectedFeedForward()
 sgd = trainers.sgd.SGD()
 
-sgd.train(X, Y, epochs=5, batch_size=200, learning_rate=0.01, network=net)
+sgd.train(X, Y, epochs=5, train_batch_size=200, eval_batch_size=2000, learning_rate=0.01, network=net)
 
 
