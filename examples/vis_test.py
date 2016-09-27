@@ -37,5 +37,48 @@ ax.set_zlabel('Z')
 ax.set_zlim(-30, 30)
 
 
-
 plt.show()
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+#%matplotlib
+
+# the random data
+color1 = np.array([1.0, 0.0, 0.0]) # red
+x1 = np.random.randn(50)
+y1 = np.random.randn(50)
+
+plt.ion()
+
+fig, ax = plt.subplots(figsize=(5.5, 5.5))
+
+fig.show()
+fig.canvas.draw()
+
+# the scatter plot:
+scat1 = ax.scatter(x1, y1, c=color1)
+
+# background
+bg = fig.canvas.copy_from_bbox(ax.bbox)
+
+# adjust range of axes
+plt.xlim(-1, 1)
+plt.ylim(-1, 1)
+
+# adjust ticks
+plt.xticks(np.arange(-1,1,0.2))
+plt.yticks(np.arange(-1,1,0.2))
+
+# enable grid
+plt.grid()
+
+def update():
+  fig.canvas.restore_region(bg)
+  scat1.set_offsets(np.random.random((2, 50)))
+  ax.draw_artist(scat1)
+
+  fig.canvas.blit(ax.bbox)
+
+update()

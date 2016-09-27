@@ -1,18 +1,27 @@
 from lib.cells import DenseCell
 from lib.activations import *
+from plot.plotNeuron import plotLayer
 
 class SimpleLinearNet:
+  visualize_mode = False
+
+  import matplotlib.pyplot as plt
+  fig = plt.figure("SimpleLinearNet")
+  fig.layers = 2
+  fig.max_per_layer = 2
 
   fc1 = DenseCell(2,2, name="dense1")
+  plot1 = plotLayer(fig, figure_count=2, layer=1, name="layer1")
 
   smce = SoftmaxCrossEntropy()
+  plot2 = plotLayer(fig, figure_count=2, layer=2, name="layer2")
 
   train_objects = [fc1]
 
 
-  def forward(self, batch, target):
+  def forward(self, batch, target, visualize=False):
     """
-    Performs a forward pass through a fully connected network and prepares it for the backward pass.
+    Performs a forward pass through a f§ully connected network and prepares it for the backward pass.
     :param batch_sequence: numpy ndarray with rows as samples and cols input dimensions.
     :return:
     """
@@ -25,9 +34,12 @@ class SimpleLinearNet:
                                               "of samples"
 
     z1 = self.fc1(batch)
+    self.plot1.update(z1, visualize)
+
+    prediction = self.smce.softmax(z1)
+    self.plot2.update(np.round(prediction), visualize)
 
     loss = self.smce.forward(z1, target)
-    prediction = self.smce.softmax(z1)
 
     return loss, prediction
 

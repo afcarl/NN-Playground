@@ -3,68 +3,68 @@ import math
 
 class SGD:
 
-  def __gradient_descent_batch(self, batch, targets, learning_rate, net):
-    """
-    Performs one training iteration and updates the weights of all trainable objects in the network.
-    :param batch: mini-batch containing all inputs
-    :param targets: one-hot encoded target classes
-    :param learning_rate: the learning rate
-    :param net: the network to train
-    :return: None
-    """
-    _, pred = net.forward(batch, targets)
-    print(" batch accuracy: {:0.4f} ".format((1.0/batch.shape[0]) * np.sum(np.argmax(targets, axis=1) == np.argmax(pred, axis=1))))
-    net.backward()
+  def __init__(self, X, Y, epochs, learning_rate, train_batch_size, eval_batch_size, network):
+    assert train_batch_size <= X.shape[0], "batch size cannot be larger than the number of samples"
+    assert eval_batch_size <= X.shape[0], "batch size cannot be larger the the number of samples"
 
-    for cell in net.train_objects:
+    self.X = X
+    self.Y = Y
+    self.epochs = epochs
+    self.learning_rate = learning_rate
+    self.train_batch_size = train_batch_size
+    self.eval_batch_size = eval_batch_size
+    self.network = network
+
+  def gradient_descent_batch(self, batch, targets):
+    _, pred = self.network.forward(batch, targets)
+    print(" batch accuracy: {:0.4f} ".format((1.0/batch.shape[0]) * np.sum(np.argmax(targets, axis=1) == np.argmax(pred, axis=1))))
+    self.network.backward()
+
+    for cell in self.network.train_objects:
       dW_list = cell.get_gradient()
       dW_avg = np.mean(dW_list, axis=0)
-      dW_step = learning_rate * dW_avg
+      dW_step = self.learning_rate * dW_avg
       cell.update_weights(dW_step)
 
+  def step(self, batch, targets):
+    self.gradient_descent_batch(batch, targets)
 
-  def train(self, X, Y, epochs, train_batch_size, eval_batch_size, learning_rate, network):
-    assert train_batch_size <= X.shape[0], "batch size cannot be larger than the number of samples"
-
+  def train(self):
     print("pre evaluation:")
-    self.evaluate(X, Y, batch_size=eval_batch_size, network=network)
+    self.evaluate()
 
-    batches_per_epoch = math.ceil(X.shape[0] / train_batch_size)
+    batches_per_epoch = math.ceil(self.X.shape[0] / self.train_batch_size)
     print("batches per epoch: ", batches_per_epoch)
-    for i in range(epochs):
+    for i in range(self.epochs):
       print("Epoch {}:".format(i))
-
       for j in range(batches_per_epoch):
+        start_idx = j * self.train_batch_size
+        end_idx = start_idx + self.train_batch_size
 
-        start_idx = j * train_batch_size
-        end_idx = start_idx + train_batch_size
-
-        batch = X[start_idx:end_idx]
-        targets = Y[start_idx:end_idx]
+        batch = self.X[start_idx:end_idx]
+        targets = self.Y[start_idx:end_idx]
         print("epoch {:0.3f}".format(i + j/batches_per_epoch), end="")
-        self.__gradient_descent_batch(batch, targets, learning_rate, network)
+        self.step(batch, targets)
 
-      self.evaluate(X, Y, batch_size=eval_batch_size, network=network)
+      self.evaluate()
 
-  def evaluate(self, X, Y, batch_size, network):
-    assert batch_size <= X.shape[0], "batch size cannot be larger the the number of samples"
-
+  def evaluate(self):
     correct = 0
-    batches_per_epoch = math.ceil(X.shape[0] / batch_size)
+    batches_per_epoch = math.ceil(self.X.shape[0] / self.eval_batch_size)
 
     for j in range(batches_per_epoch):
-      start_idx = j * batch_size
-      end_idx = start_idx + batch_size
+      start_idx = j * self.eval_batch_size
+      end_idx = start_idx + self.eval_batch_size
 
-      batch = X[start_idx:end_idx]
-      targets = Y[start_idx:end_idx]
+      batch = self.X[start_idx:end_idx]
+      targets = self.Y[start_idx:end_idx]
 
-      prediction = network.forward(batch, targets)[1]
+      prediction = self.network.forward(batch, targets)[1]
       correct += np.sum(np.argmax(targets, axis=1) == np.argmax(prediction, axis=1))
 
     print("Correct: ", correct)
-    print("Samples: ", X.shape[0])
-    print("Accuracy: ", (1.0 / X.shape[0]) * correct)
+    print("Samples: ", self.X.shape[0])
+    print("Accuracy: ", (1.0 / self.X.shape[0]) * correct)
 
 
 

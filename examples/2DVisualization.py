@@ -2,6 +2,7 @@
 2D visualization test network
 """
 
+%matplotlib
 import numpy as np
 from misc.utils import shuffle_in_unison
 from networks.SimpleLinearNet import SimpleLinearNet
@@ -28,8 +29,15 @@ Y = np.concatenate((red_target, blue_target), axis=0)
 shuffle_in_unison(X, Y)
 
 net = SimpleLinearNet()
-sgd = trainers.sgd.SGD()
+sgd = trainers.sgd.SGD(X, Y, learning_rate=0.01,  epochs=1, train_batch_size=10, eval_batch_size=200,network=net)
 
 
-sgd.train(X, Y, epochs=5, train_batch_size=20, eval_batch_size=200, learning_rate=0.01, network=net)
+from trainers.visualTrainer import VisualTrainer
+vt = VisualTrainer(sgd)
+
+sgd.evaluate()
+vt.train()
+
+
+#sgd.train()
 

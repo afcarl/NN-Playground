@@ -25,8 +25,8 @@ X, Y = load_data("/home/schlag/MyStuff/Data/MNIST/")
 misc.utils.shuffle_in_unison(X, Y)
 
 net = FullyConnectedFeedForward()
-sgd = trainers.sgd.SGD()
+sgd = trainers.sgd.SGD(X, Y, epochs=5, learning_rate=0.01, train_batch_size=200, eval_batch_size=2000, network=net)
 
-sgd.train(X, Y, epochs=5, train_batch_size=200, eval_batch_size=2000, learning_rate=0.01, network=net)
+sgd.train()
 
 
